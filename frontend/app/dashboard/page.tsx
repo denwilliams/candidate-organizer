@@ -76,7 +76,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div
+            className="bg-white overflow-hidden shadow rounded-lg cursor-pointer hover:shadow-md transition-shadow"
+            onClick={() => router.push('/jobs')}
+          >
             <div className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0 bg-blue-500 rounded-md p-3">
@@ -95,7 +98,7 @@ export default function DashboardPage() {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Job Postings</dt>
-                    <dd className="text-lg font-semibold text-gray-900">Coming soon</dd>
+                    <dd className="text-lg font-semibold text-gray-900">View all →</dd>
                   </dl>
                 </div>
               </div>
@@ -174,8 +177,8 @@ export default function DashboardPage() {
               <span className="ml-2">Google OAuth authentication is now active</span>
             </li>
             <li className="flex items-start">
-              <span className="flex-shrink-0 h-5 w-5 text-gray-400">○</span>
-              <span className="ml-2">Create your first job posting</span>
+              <span className="flex-shrink-0 h-5 w-5 text-green-500">✓</span>
+              <span className="ml-2">Job posting management is ready</span>
             </li>
             <li className="flex items-start">
               <span className="flex-shrink-0 h-5 w-5 text-gray-400">○</span>
