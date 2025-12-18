@@ -1,0 +1,12 @@
+{
+  "name": "candidate-organizer-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "heroku-prebuild": "cd ../frontend && npm install && npm run build && cd ../backend && mkdir -p static && cp -r ../frontend/out/* static/"
+  },
+  "engines": {
+    "node": ">=18.x",
+    "npm": ">=9.x"
+  }
+}

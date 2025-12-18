@@ -3,6 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/candidate-organizer/backend/internal/api/handlers"
@@ -140,7 +143,63 @@ func (s *Server) Router() http.Handler {
 		})
 	})
 
+	// Serve static files from frontend build
+	// This should come after all API routes
+	staticDir := getStaticDir()
+	if staticDir != "" {
+		fileServer := http.FileServer(http.Dir(staticDir))
+		r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+			// Serve static files, but fallback to index.html for client-side routing
+			path := filepath.Join(staticDir, r.URL.Path)
+
+			// Check if the file exists
+			if _, err := os.Stat(path); os.IsNotExist(err) {
+				// If it's not a file, check if it's a directory with index.html
+				indexPath := filepath.Join(path, "index.html")
+				if _, err := os.Stat(indexPath); err == nil {
+					http.ServeFile(w, r, indexPath)
+					return
+				}
+
+				// If no file or directory exists, serve the root index.html for client-side routing
+				rootIndex := filepath.Join(staticDir, "index.html")
+				if _, err := os.Stat(rootIndex); err == nil {
+					http.ServeFile(w, r, rootIndex)
+					return
+				}
+			}
+
+			// Remove leading slash for file server
+			r.URL.Path = strings.TrimPrefix(r.URL.Path, "/")
+			fileServer.ServeHTTP(w, r)
+		})
+	}
+
 	return r
+}
+
+// getStaticDir returns the directory containing static frontend files
+func getStaticDir() string {
+	// Check for STATIC_DIR environment variable first
+	if dir := os.Getenv("STATIC_DIR"); dir != "" {
+		return dir
+	}
+
+	// Default locations to check
+	dirs := []string{
+		"./static",
+		"../static",
+		"./frontend/out",
+		"../frontend/out",
+	}
+
+	for _, dir := range dirs {
+		if _, err := os.Stat(dir); err == nil {
+			return dir
+		}
+	}
+
+	return ""
 }
 
 // handleHealth is a health check endpoint

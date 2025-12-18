@@ -1,15 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: process.env.NEXT_PUBLIC_API_URL + '/api/:path*',
-      },
-    ];
+  output: 'export',
+  // Disable image optimization for static export
+  images: {
+    unoptimized: true,
   },
+  // Remove rewrites since API will be on same origin
+  basePath: '',
+  trailingSlash: true,
 };
 
 module.exports = nextConfig;
