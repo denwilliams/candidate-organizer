@@ -14,6 +14,7 @@ npm run build
 
 # Copy static assets to standalone directory (required for standalone mode)
 echo "   Copying static assets to standalone..."
+mkdir -p .next/standalone/.next
 cp -r .next/static .next/standalone/.next/static
 if [ -d "public" ]; then
     cp -r public .next/standalone/public
