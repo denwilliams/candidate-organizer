@@ -11,6 +11,14 @@ echo "1. Building Next.js frontend..."
 cd frontend
 npm install --include=dev
 npm run build
+
+# Copy static assets to standalone directory (required for standalone mode)
+echo "   Copying static assets to standalone..."
+cp -r .next/static .next/standalone/.next/static
+if [ -d "public" ]; then
+    cp -r public .next/standalone/public
+fi
+
 cd ..
 
 # Prepare Backend for Go buildpack
