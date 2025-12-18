@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/candidate-organizer/backend/internal/api"
 	"github.com/candidate-organizer/backend/internal/config"
