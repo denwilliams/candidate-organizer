@@ -34,3 +34,9 @@ server
 *.swp
 *.swo
 *~
+
+# Frontend build output (built during deployment)
+/static/
+
+# Node modules (if any Node.js tools are used)
+node_modules/
