@@ -2,6 +2,8 @@
 
 A comprehensive web application to help organize and triage job candidates with AI-powered insights.
 
+**Note**: This application is designed for single-organization use. Each organization is expected to have their own installation - no multi-tenancy is required.
+
 ## Features
 
 ### Core Features
@@ -20,6 +22,7 @@ A comprehensive web application to help organize and triage job candidates with 
 ### Future Features
 - Advanced filtering and sorting
 - CSV export for reporting
+- Embeddings generation for candidates and job postings for advanced search and matching capabilities
 - Email notifications
 - Interview scheduling
 
@@ -41,6 +44,11 @@ A comprehensive web application to help organize and triage job candidates with 
 - **Containerization**: Docker
 - **Orchestration**: Docker Compose
 - **Database**: PostgreSQL with UUID support
+
+### LLM Integration
+- **AI Provider**: OpenAI GPT-4o (or GPT-4 Turbo) for AI features
+- **Chat Implementation**: Streaming API for real-time chat responses
+- **Use Cases**: Candidate summaries, intelligent chat assistant for candidate evaluation
 
 ## Project Structure
 

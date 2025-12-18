@@ -128,21 +128,25 @@
 ## Phase 6: AI Features
 
 ### 6.1 AI Candidate Summary
-- [ ] Backend: Integrate AI service (OpenAI API or similar)
+- [ ] Backend: Integrate OpenAI GPT-4o (or GPT-4 Turbo) API
 - [ ] Backend: Generate candidate summary endpoint
 - [ ] Backend: Cache AI summaries to reduce API costs
+- [ ] Backend: Prompt engineering for candidate evaluation (strengths, gaps, red flags)
 - [ ] Frontend: AI summary section in candidate detail
 - [ ] Frontend: Regenerate summary button
 - [ ] Frontend: Loading state for AI generation
 
-### 6.2 AI Chat Interface
-- [ ] Backend: AI chat endpoint (streaming response)
+### 6.2 AI Chat Interface with Streaming
+- [ ] Backend: AI chat endpoint with streaming response (SSE or WebSocket)
 - [ ] Backend: Context building from job postings and candidates
+- [ ] Backend: Implement OpenAI streaming API integration
+- [ ] Backend: Chat session management
 - [ ] Frontend: Chat interface component
 - [ ] Frontend: Chat history display
 - [ ] Frontend: Message input with send button
-- [ ] Frontend: Streaming response handling
+- [ ] Frontend: Real-time streaming response handling (chunk by chunk)
 - [ ] Frontend: Example questions/prompts
+- [ ] Frontend: Loading/typing indicators
 
 ## Phase 7: Future Features
 
@@ -160,6 +164,16 @@
 - [ ] Frontend: Export button on candidates list
 - [ ] Frontend: Export progress indicator
 - [ ] Frontend: Download completed file
+
+### 7.3 Embeddings for Advanced Search & Matching
+- [ ] Backend: Generate embeddings for candidates (resume content, skills)
+- [ ] Backend: Generate embeddings for job postings (requirements, description)
+- [ ] Backend: Store embeddings in database (vector column or separate table)
+- [ ] Backend: Implement similarity search using embeddings
+- [ ] Backend: Candidate-to-job matching algorithm using cosine similarity
+- [ ] Frontend: "Best Match" indicator on candidates list
+- [ ] Frontend: Semantic search functionality
+- [ ] Frontend: Match score display on candidate cards
 
 ## Phase 8: DevOps & Deployment
 
@@ -219,14 +233,30 @@
 
 ## Current Status
 
-**Phase 1: Project Setup & Infrastructure** - NOT STARTED
+**Phase 1: Project Setup & Infrastructure** - ✅ COMPLETED
+- ✅ Phase 1.1: Initial Project Structure - All tasks completed
+- ✅ Phase 1.2: Database Setup - Schema and migrations created
+- ✅ Phase 1.3: Backend Foundation - Repository interfaces implemented
+- ✅ Phase 1.4: Frontend Foundation - Next.js project initialized
+
+**Next Up**: Phase 2 - User Management & Authentication
 
 ---
 
 ## Notes
 
+### Architecture Decisions
+- **No Multi-Tenancy**: Each organization runs their own installation of the app. Simplifies architecture and data isolation.
+- **Single Docker Container**: Production deployment bundles frontend and backend into one container for easy deployment
+- **Clean Architecture**: Repository pattern with handwritten SQL (NO ORM)
+
+### Implementation Priorities
 - Prioritize MVP features first (Phases 1-5) before Future Features (Phase 7)
-- AI features (Phase 6) require API key configuration and cost consideration
-- All database operations use handwritten SQL (NO ORM as per requirements)
+- AI features (Phase 6) require OpenAI API key and cost monitoring
+- Chat feature uses streaming API for real-time responses
 - Google Workspace domain restriction should be configurable via environment variable
-- Resume parsing may require external service or library (consider open-source options)
+
+### Technical Considerations
+- Resume parsing may require external service or library (consider open-source PDF parsing)
+- Embeddings (Phase 7.3) will require vector storage solution (pgvector extension for PostgreSQL recommended)
+- Streaming chat responses require SSE (Server-Sent Events) or WebSocket implementation
