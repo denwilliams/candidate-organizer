@@ -13,22 +13,11 @@ npm install --include=dev
 npm run build
 cd ..
 
-# Build Backend
+# Prepare Backend for Go buildpack
 echo ""
-echo "2. Building Go backend..."
-cd backend
-
-# Create bin directory if it doesn't exist
-mkdir -p bin
-
-# Build the Go binary
-echo "   Compiling Go server..."
-go build -o bin/server ./cmd/server
-
-# Make it executable
-chmod +x bin/server
-
-cd ..
+echo "2. Preparing backend files for Go buildpack..."
+echo "   Copying backend source to root..."
+cp -r backend/cmd backend/internal backend/migrations .
 
 # Make start-services.sh executable
 chmod +x start-services.sh
@@ -38,5 +27,6 @@ echo "========================================"
 echo "Build completed successfully!"
 echo "========================================"
 echo "Frontend: frontend/.next/"
-echo "Backend:  backend/bin/server"
+echo "Backend:  backend files copied to root"
+echo "         (Go buildpack will compile binary)"
 echo "========================================"
