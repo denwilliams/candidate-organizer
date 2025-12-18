@@ -1,6 +1,6 @@
 module github.com/candidate-organizer/backend
 
-// +heroku install ./backend/cmd/server
+// +heroku install ./cmd/server
 
 go 1.24.7
 
