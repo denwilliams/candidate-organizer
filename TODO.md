@@ -70,16 +70,16 @@
 ## Phase 3: Core Features - Job Postings
 
 ### 3.1 Job Posting CRUD
-- [ ] Backend: Create job posting endpoint
-- [ ] Backend: List job postings endpoint (with pagination)
-- [ ] Backend: Get single job posting endpoint
-- [ ] Backend: Update job posting endpoint
-- [ ] Backend: Delete job posting endpoint
-- [ ] Frontend: Job postings list page
-- [ ] Frontend: Create job posting form
-- [ ] Frontend: Edit job posting form
-- [ ] Frontend: Job posting detail view
-- [ ] Frontend: Delete confirmation modal
+- [x] Backend: Create job posting endpoint
+- [x] Backend: List job postings endpoint (with pagination)
+- [x] Backend: Get single job posting endpoint
+- [x] Backend: Update job posting endpoint
+- [x] Backend: Delete job posting endpoint
+- [x] Frontend: Job postings list page
+- [x] Frontend: Create job posting form
+- [x] Frontend: Edit job posting form
+- [x] Frontend: Job posting detail view
+- [x] Frontend: Delete confirmation modal
 
 ## Phase 4: Core Features - Candidates
 
@@ -243,6 +243,9 @@
 - ✅ Phase 2.1: Authentication - Complete (7/7)
 - ✅ Phase 2.2: User Management - Complete (5/5)
 
+**Phase 3: Core Features - Job Postings** - ✅ COMPLETE
+- ✅ Phase 3.1: Job Posting CRUD - Complete (10/10)
+
 **Completed in this session:**
 - ✅ Implemented Google OAuth 2.0 authentication (backend and frontend)
 - ✅ Created JWT token generation and validation utilities
@@ -254,8 +257,13 @@
 - ✅ Implemented user management endpoints (list users, promote to admin)
 - ✅ Created admin-only user management page with role badges
 - ✅ Added promote to admin functionality with proper access controls
+- ✅ Implemented all job posting CRUD endpoints (create, list, get, update, delete)
+- ✅ Created job postings list page with pagination and filters
+- ✅ Created job posting forms (new and edit)
+- ✅ Created job posting detail view
+- ✅ Integrated job posting management into dashboard
 
-**Next Up**: Phase 3 - Job Postings CRUD operations
+**Next Up**: Phase 4 - Candidate Management
 
 ---
 

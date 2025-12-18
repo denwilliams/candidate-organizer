@@ -1,5 +1,5 @@
 import { api } from '../client';
-import { JobPosting, PaginatedResponse } from '../types';
+import { JobPosting } from '../types';
 
 export interface CreateJobPostingData {
   title: string;
@@ -10,24 +10,35 @@ export interface CreateJobPostingData {
   status: 'open' | 'closed' | 'draft';
 }
 
-export interface UpdateJobPostingData extends Partial<CreateJobPostingData> {}
+export interface UpdateJobPostingData extends CreateJobPostingData {}
+
+export interface JobsListResponse {
+  jobs: JobPosting[];
+  limit: number;
+  offset: number;
+}
+
+export interface JobResponse {
+  job: JobPosting;
+  message?: string;
+}
 
 export const jobsApi = {
-  create: (data: CreateJobPostingData, token: string) =>
-    api.post<JobPosting>('/api/jobs', data, token),
+  create: (data: CreateJobPostingData, token?: string) =>
+    api.post<JobResponse>('/api/v1/jobs', data, token),
 
-  list: (page: number = 1, pageSize: number = 20, token: string) =>
-    api.get<PaginatedResponse<JobPosting>>(
-      `/api/jobs?page=${page}&page_size=${pageSize}`,
+  list: (limit: number = 20, offset: number = 0, token?: string) =>
+    api.get<JobsListResponse>(
+      `/api/v1/jobs?limit=${limit}&offset=${offset}`,
       token
     ),
 
-  getById: (id: string, token: string) =>
-    api.get<JobPosting>(`/api/jobs/${id}`, token),
+  getById: (id: string, token?: string) =>
+    api.get<JobResponse>(`/api/v1/jobs/${id}`, token),
 
-  update: (id: string, data: UpdateJobPostingData, token: string) =>
-    api.put<JobPosting>(`/api/jobs/${id}`, data, token),
+  update: (id: string, data: UpdateJobPostingData, token?: string) =>
+    api.put<JobResponse>(`/api/v1/jobs/${id}`, data, token),
 
-  delete: (id: string, token: string) =>
-    api.delete(`/api/jobs/${id}`, token),
+  delete: (id: string, token?: string) =>
+    api.delete<{ message: string }>(`/api/v1/jobs/${id}`, token),
 };

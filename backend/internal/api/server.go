@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -12,6 +13,7 @@ import (
 	appmiddleware "github.com/candidate-organizer/backend/internal/api/middleware"
 	"github.com/candidate-organizer/backend/internal/auth"
 	"github.com/candidate-organizer/backend/internal/config"
+	"github.com/candidate-organizer/backend/internal/models"
 	"github.com/candidate-organizer/backend/internal/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -260,12 +262,256 @@ func (s *Server) handlePromoteUser(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// Job posting handlers
+
+// handleListJobs returns a list of job postings with pagination
+func (s *Server) handleListJobs(w http.ResponseWriter, r *http.Request) {
+	// Parse pagination parameters
+	limit := 20 // default
+	offset := 0 // default
+
+	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
+		if l, err := parseInt(limitStr); err == nil && l > 0 && l <= 100 {
+			limit = l
+		}
+	}
+
+	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
+		if o, err := parseInt(offsetStr); err == nil && o >= 0 {
+			offset = o
+		}
+	}
+
+	jobs, err := s.jobRepo.List(r.Context(), limit, offset)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "Failed to fetch job postings",
+		})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"jobs":   jobs,
+		"limit":  limit,
+		"offset": offset,
+	})
+}
+
+// handleCreateJob creates a new job posting
+func (s *Server) handleCreateJob(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Title        string `json:"title"`
+		Description  string `json:"description"`
+		Requirements string `json:"requirements"`
+		Location     string `json:"location"`
+		SalaryRange  string `json:"salary_range"`
+		Status       string `json:"status"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "Invalid request body",
+		})
+		return
+	}
+
+	// Validate required fields
+	if req.Title == "" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "Title is required",
+		})
+		return
+	}
+
+	// Set default status if not provided
+	if req.Status == "" {
+		req.Status = "draft"
+	}
+
+	// Validate status
+	if req.Status != "draft" && req.Status != "open" && req.Status != "closed" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "Status must be 'draft', 'open', or 'closed'",
+		})
+		return
+	}
+
+	// Get user from context
+	user := r.Context().Value("user").(*models.User)
+
+	job := &models.JobPosting{
+		Title:        req.Title,
+		Description:  req.Description,
+		Requirements: req.Requirements,
+		Location:     req.Location,
+		SalaryRange:  req.SalaryRange,
+		Status:       req.Status,
+		CreatedBy:    user.ID,
+	}
+
+	if err := s.jobRepo.Create(r.Context(), job); err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "Failed to create job posting",
+		})
+		return
+	}
+
+	respondJSON(w, http.StatusCreated, map[string]interface{}{
+		"message": "Job posting created successfully",
+		"job":     job,
+	})
+}
+
+// handleGetJob returns a single job posting by ID
+func (s *Server) handleGetJob(w http.ResponseWriter, r *http.Request) {
+	jobID := chi.URLParam(r, "id")
+	if jobID == "" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "Job ID is required",
+		})
+		return
+	}
+
+	job, err := s.jobRepo.GetByID(r.Context(), jobID)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "Failed to fetch job posting",
+		})
+		return
+	}
+
+	if job == nil {
+		respondJSON(w, http.StatusNotFound, map[string]string{
+			"error": "Job posting not found",
+		})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"job": job,
+	})
+}
+
+// handleUpdateJob updates an existing job posting
+func (s *Server) handleUpdateJob(w http.ResponseWriter, r *http.Request) {
+	jobID := chi.URLParam(r, "id")
+	if jobID == "" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "Job ID is required",
+		})
+		return
+	}
+
+	// Check if job exists
+	existingJob, err := s.jobRepo.GetByID(r.Context(), jobID)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "Failed to fetch job posting",
+		})
+		return
+	}
+
+	if existingJob == nil {
+		respondJSON(w, http.StatusNotFound, map[string]string{
+			"error": "Job posting not found",
+		})
+		return
+	}
+
+	var req struct {
+		Title        string `json:"title"`
+		Description  string `json:"description"`
+		Requirements string `json:"requirements"`
+		Location     string `json:"location"`
+		SalaryRange  string `json:"salary_range"`
+		Status       string `json:"status"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "Invalid request body",
+		})
+		return
+	}
+
+	// Validate required fields
+	if req.Title == "" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "Title is required",
+		})
+		return
+	}
+
+	// Validate status
+	if req.Status != "" && req.Status != "draft" && req.Status != "open" && req.Status != "closed" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "Status must be 'draft', 'open', or 'closed'",
+		})
+		return
+	}
+
+	// Update job with new data
+	existingJob.Title = req.Title
+	existingJob.Description = req.Description
+	existingJob.Requirements = req.Requirements
+	existingJob.Location = req.Location
+	existingJob.SalaryRange = req.SalaryRange
+	if req.Status != "" {
+		existingJob.Status = req.Status
+	}
+
+	if err := s.jobRepo.Update(r.Context(), existingJob); err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "Failed to update job posting",
+		})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"message": "Job posting updated successfully",
+		"job":     existingJob,
+	})
+}
+
+// handleDeleteJob deletes a job posting
+func (s *Server) handleDeleteJob(w http.ResponseWriter, r *http.Request) {
+	jobID := chi.URLParam(r, "id")
+	if jobID == "" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "Job ID is required",
+		})
+		return
+	}
+
+	// Check if job exists
+	job, err := s.jobRepo.GetByID(r.Context(), jobID)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "Failed to fetch job posting",
+		})
+		return
+	}
+
+	if job == nil {
+		respondJSON(w, http.StatusNotFound, map[string]string{
+			"error": "Job posting not found",
+		})
+		return
+	}
+
+	if err := s.jobRepo.Delete(r.Context(), jobID); err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "Failed to delete job posting",
+		})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]string{
+		"message": "Job posting deleted successfully",
+	})
+}
+
 // Placeholder handlers - to be implemented
-func (s *Server) handleListJobs(w http.ResponseWriter, r *http.Request)                { notImplemented(w) }
-func (s *Server) handleCreateJob(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
-func (s *Server) handleGetJob(w http.ResponseWriter, r *http.Request)                  { notImplemented(w) }
-func (s *Server) handleUpdateJob(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
-func (s *Server) handleDeleteJob(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
 func (s *Server) handleListCandidates(w http.ResponseWriter, r *http.Request)          { notImplemented(w) }
 func (s *Server) handleCreateCandidate(w http.ResponseWriter, r *http.Request)         { notImplemented(w) }
 func (s *Server) handleUploadResume(w http.ResponseWriter, r *http.Request)            { notImplemented(w) }
@@ -292,4 +538,10 @@ func respondJSON(w http.ResponseWriter, status int, data interface{}) {
 
 func notImplemented(w http.ResponseWriter) {
 	respondJSON(w, http.StatusNotImplemented, map[string]string{"error": "Not implemented yet"})
+}
+
+func parseInt(s string) (int, error) {
+	var result int
+	_, err := fmt.Sscanf(s, "%d", &result)
+	return result, err
 }
