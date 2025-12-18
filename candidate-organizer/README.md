@@ -17,3 +17,14 @@ Web application to help organize and triage job candidates.
 Future Features:
 - Filter and sort candidates based on various criteria
 - Export candidate data to CSV for reporting or sharing
+
+## Tech Stack
+
+- React with Next js for Frontend
+- Shadcn UI for component library
+- Backend: Golang
+- Postgres for Database
+- NO ORM, create manual repository interfaces and have concrete implementations for Postgres with handwritten SQL queries
+- Bundle into single Docker container for easy deployment where the React project is served via the Golang backend
+- When developing locally allow running React frontend and Golang backend separately for faster development cycle
+- Use Docker Compose to orchestrate local development environment with Postgres and backend/frontend services
