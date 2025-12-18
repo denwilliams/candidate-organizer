@@ -3,8 +3,13 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
+	"github.com/candidate-organizer/backend/internal/api/handlers"
+	appmiddleware "github.com/candidate-organizer/backend/internal/api/middleware"
+	"github.com/candidate-organizer/backend/internal/auth"
 	"github.com/candidate-organizer/backend/internal/config"
+	"github.com/candidate-organizer/backend/internal/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -12,13 +17,41 @@ import (
 
 // Server represents the API server
 type Server struct {
-	config *config.Config
+	config         *config.Config
+	userRepo       repository.UserRepository
+	jobRepo        repository.JobRepository
+	candidateRepo  repository.CandidateRepository
+	commentRepo    repository.CommentRepository
+	attributeRepo  repository.AttributeRepository
+	authHandler    *handlers.AuthHandler
+	authMiddleware *appmiddleware.AuthMiddleware
 }
 
 // NewServer creates a new API server
-func NewServer(cfg *config.Config) *Server {
+func NewServer(
+	cfg *config.Config,
+	userRepo repository.UserRepository,
+	jobRepo repository.JobRepository,
+	candidateRepo repository.CandidateRepository,
+	commentRepo repository.CommentRepository,
+	attributeRepo repository.AttributeRepository,
+) *Server {
+	// Create auth handler
+	authHandler := handlers.NewAuthHandler(userRepo, cfg)
+
+	// Create JWT manager and auth middleware
+	jwtManager := auth.NewJWTManager(cfg.JWTSecret, 24*time.Hour)
+	authMiddleware := appmiddleware.NewAuthMiddleware(jwtManager, userRepo)
+
 	return &Server{
-		config: cfg,
+		config:         cfg,
+		userRepo:       userRepo,
+		jobRepo:        jobRepo,
+		candidateRepo:  candidateRepo,
+		commentRepo:    commentRepo,
+		attributeRepo:  attributeRepo,
+		authHandler:    authHandler,
+		authMiddleware: authMiddleware,
 	}
 }
 
@@ -46,19 +79,25 @@ func (s *Server) Router() http.Handler {
 	r.Route("/api/v1", func(r chi.Router) {
 		// Auth routes (public)
 		r.Route("/auth", func(r chi.Router) {
-			r.Get("/google", s.handleGoogleLogin)
-			r.Get("/callback", s.handleGoogleCallback)
-			r.Post("/refresh", s.handleRefreshToken)
+			r.Get("/google", s.authHandler.GoogleLogin)
+			r.Get("/callback", s.authHandler.GoogleCallback)
 		})
 
 		// Protected routes
 		r.Group(func(r chi.Router) {
-			// r.Use(s.authMiddleware) // TODO: Implement auth middleware
+			// Apply auth middleware to all routes in this group
+			r.Use(s.authMiddleware.Authenticate)
+
+			// Auth-related protected endpoints
+			r.Route("/auth", func(r chi.Router) {
+				r.Post("/refresh", s.authHandler.RefreshToken)
+				r.Post("/logout", s.authHandler.Logout)
+				r.Get("/me", s.authHandler.GetProfile)
+			})
 
 			// User routes
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", s.handleListUsers)
-				r.Get("/me", s.handleGetCurrentUser)
 				r.Post("/{id}/promote", s.handlePromoteUser)
 			})
 
@@ -110,33 +149,29 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 // Placeholder handlers - to be implemented
-func (s *Server) handleGoogleLogin(w http.ResponseWriter, r *http.Request)        { notImplemented(w) }
-func (s *Server) handleGoogleCallback(w http.ResponseWriter, r *http.Request)     { notImplemented(w) }
-func (s *Server) handleRefreshToken(w http.ResponseWriter, r *http.Request)       { notImplemented(w) }
-func (s *Server) handleListUsers(w http.ResponseWriter, r *http.Request)          { notImplemented(w) }
-func (s *Server) handleGetCurrentUser(w http.ResponseWriter, r *http.Request)     { notImplemented(w) }
-func (s *Server) handlePromoteUser(w http.ResponseWriter, r *http.Request)        { notImplemented(w) }
-func (s *Server) handleListJobs(w http.ResponseWriter, r *http.Request)           { notImplemented(w) }
-func (s *Server) handleCreateJob(w http.ResponseWriter, r *http.Request)          { notImplemented(w) }
-func (s *Server) handleGetJob(w http.ResponseWriter, r *http.Request)             { notImplemented(w) }
-func (s *Server) handleUpdateJob(w http.ResponseWriter, r *http.Request)          { notImplemented(w) }
-func (s *Server) handleDeleteJob(w http.ResponseWriter, r *http.Request)          { notImplemented(w) }
-func (s *Server) handleListCandidates(w http.ResponseWriter, r *http.Request)     { notImplemented(w) }
-func (s *Server) handleCreateCandidate(w http.ResponseWriter, r *http.Request)    { notImplemented(w) }
-func (s *Server) handleUploadResume(w http.ResponseWriter, r *http.Request)       { notImplemented(w) }
-func (s *Server) handleGetCandidate(w http.ResponseWriter, r *http.Request)       { notImplemented(w) }
-func (s *Server) handleUpdateCandidate(w http.ResponseWriter, r *http.Request)    { notImplemented(w) }
-func (s *Server) handleDeleteCandidate(w http.ResponseWriter, r *http.Request)    { notImplemented(w) }
-func (s *Server) handleUpdateCandidateStatus(w http.ResponseWriter, r *http.Request) { notImplemented(w) }
-func (s *Server) handleAddAttribute(w http.ResponseWriter, r *http.Request)       { notImplemented(w) }
-func (s *Server) handleUpdateAttribute(w http.ResponseWriter, r *http.Request)    { notImplemented(w) }
-func (s *Server) handleDeleteAttribute(w http.ResponseWriter, r *http.Request)    { notImplemented(w) }
-func (s *Server) handleListComments(w http.ResponseWriter, r *http.Request)       { notImplemented(w) }
-func (s *Server) handleAddComment(w http.ResponseWriter, r *http.Request)         { notImplemented(w) }
-func (s *Server) handleUpdateComment(w http.ResponseWriter, r *http.Request)      { notImplemented(w) }
-func (s *Server) handleDeleteComment(w http.ResponseWriter, r *http.Request)      { notImplemented(w) }
-func (s *Server) handleGenerateSummary(w http.ResponseWriter, r *http.Request)    { notImplemented(w) }
-func (s *Server) handleChat(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
+func (s *Server) handleListUsers(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
+func (s *Server) handlePromoteUser(w http.ResponseWriter, r *http.Request)             { notImplemented(w) }
+func (s *Server) handleListJobs(w http.ResponseWriter, r *http.Request)                { notImplemented(w) }
+func (s *Server) handleCreateJob(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
+func (s *Server) handleGetJob(w http.ResponseWriter, r *http.Request)                  { notImplemented(w) }
+func (s *Server) handleUpdateJob(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
+func (s *Server) handleDeleteJob(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
+func (s *Server) handleListCandidates(w http.ResponseWriter, r *http.Request)          { notImplemented(w) }
+func (s *Server) handleCreateCandidate(w http.ResponseWriter, r *http.Request)         { notImplemented(w) }
+func (s *Server) handleUploadResume(w http.ResponseWriter, r *http.Request)            { notImplemented(w) }
+func (s *Server) handleGetCandidate(w http.ResponseWriter, r *http.Request)            { notImplemented(w) }
+func (s *Server) handleUpdateCandidate(w http.ResponseWriter, r *http.Request)         { notImplemented(w) }
+func (s *Server) handleDeleteCandidate(w http.ResponseWriter, r *http.Request)         { notImplemented(w) }
+func (s *Server) handleUpdateCandidateStatus(w http.ResponseWriter, r *http.Request)   { notImplemented(w) }
+func (s *Server) handleAddAttribute(w http.ResponseWriter, r *http.Request)            { notImplemented(w) }
+func (s *Server) handleUpdateAttribute(w http.ResponseWriter, r *http.Request)         { notImplemented(w) }
+func (s *Server) handleDeleteAttribute(w http.ResponseWriter, r *http.Request)         { notImplemented(w) }
+func (s *Server) handleListComments(w http.ResponseWriter, r *http.Request)            { notImplemented(w) }
+func (s *Server) handleAddComment(w http.ResponseWriter, r *http.Request)              { notImplemented(w) }
+func (s *Server) handleUpdateComment(w http.ResponseWriter, r *http.Request)           { notImplemented(w) }
+func (s *Server) handleDeleteComment(w http.ResponseWriter, r *http.Request)           { notImplemented(w) }
+func (s *Server) handleGenerateSummary(w http.ResponseWriter, r *http.Request)         { notImplemented(w) }
+func (s *Server) handleChat(w http.ResponseWriter, r *http.Request)                    { notImplemented(w) }
 
 // Helper functions
 func respondJSON(w http.ResponseWriter, status int, data interface{}) {

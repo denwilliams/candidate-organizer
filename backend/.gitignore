@@ -25,6 +25,8 @@ go.work
 /bin
 /dist
 /tmp
+/server
+server
 
 # IDE
 .vscode/

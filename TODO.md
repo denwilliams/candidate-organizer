@@ -31,11 +31,11 @@
   - [x] AttributeRepository interface
 - [x] Implement Postgres repository implementations with handwritten SQL (User, Job, Candidate)
 - [x] Set up HTTP server (using chi router)
-- [x] Create middleware (logging, CORS) - auth middleware placeholder created
-- [ ] Implement Google OAuth authentication
-  - [ ] Workspace domain validation
-  - [ ] JWT token generation and validation
-  - [ ] First user becomes admin logic
+- [x] Create middleware (logging, CORS, auth middleware)
+- [x] Implement Google OAuth authentication
+  - [x] Workspace domain validation
+  - [x] JWT token generation and validation
+  - [x] First user becomes admin logic
 - [x] Create error handling utilities
 - [x] Set up environment variable management
 
@@ -44,7 +44,7 @@
 - [x] Configure Shadcn UI component library
 - [x] Set up Tailwind CSS
 - [x] Create base layout components
-- [ ] Implement authentication flow (Google OAuth)
+- [x] Implement authentication flow (Google OAuth)
 - [x] Create protected route wrapper
 - [x] Set up API client/fetch utilities
 - [x] Create global state management (Context API or Zustand)
@@ -52,13 +52,13 @@
 ## Phase 2: Core Features - User Management & Authentication
 
 ### 2.1 Authentication
-- [ ] Backend: Google OAuth endpoints (/auth/google, /auth/callback)
-- [ ] Backend: Token refresh endpoint
-- [ ] Backend: User profile endpoint
-- [ ] Frontend: Login page with Google sign-in button
-- [ ] Frontend: Auth context provider
-- [ ] Frontend: Protected route component
-- [ ] First user admin assignment logic
+- [x] Backend: Google OAuth endpoints (/auth/google, /auth/callback)
+- [x] Backend: Token refresh endpoint
+- [x] Backend: User profile endpoint
+- [x] Frontend: Login page with Google sign-in button
+- [x] Frontend: Auth context provider
+- [x] Frontend: Protected route component
+- [x] First user admin assignment logic
 
 ### 2.2 User Management (Admin Only)
 - [ ] Backend: List all users endpoint
@@ -233,21 +233,26 @@
 
 ## Current Status
 
-**Phase 1: Project Setup & Infrastructure** - 🟡 IN PROGRESS (Core infrastructure complete, auth pending)
+**Phase 1: Project Setup & Infrastructure** - ✅ COMPLETE
 - ✅ Phase 1.1: Initial Project Structure - All tasks completed (6/6)
 - ✅ Phase 1.2: Database Setup - Schema and migrations created (6/7 - migration runner uses Docker)
-- 🟡 Phase 1.3: Backend Foundation - Nearly complete (9/10 - only OAuth auth pending)
-- 🟡 Phase 1.4: Frontend Foundation - Nearly complete (7/8 - only OAuth implementation pending)
+- ✅ Phase 1.3: Backend Foundation - Complete (10/10)
+- ✅ Phase 1.4: Frontend Foundation - Complete (8/8)
+
+**Phase 2: Core Features - User Management & Authentication** - 🟡 IN PROGRESS
+- ✅ Phase 2.1: Authentication - Complete (7/7)
+- 🔄 Phase 2.2: User Management - Not started (0/5)
 
 **Completed in this session:**
-- ✅ Created CommentRepository interface and implementation
-- ✅ Created AttributeRepository interface and implementation
-- ✅ Created error handling utilities (AppError, response helpers)
-- ✅ Configured Shadcn UI component library with Button component
-- ✅ Set up comprehensive API client/fetch utilities with typed services
-- ✅ Created global state management with AuthContext and ProtectedRoute component
+- ✅ Implemented Google OAuth 2.0 authentication (backend and frontend)
+- ✅ Created JWT token generation and validation utilities
+- ✅ Implemented workspace domain validation
+- ✅ First user becomes admin logic
+- ✅ Auth middleware with HTTP-only cookie support
+- ✅ Login page, auth callback page, and dashboard
+- ✅ Integrated authentication flow with AuthContext
 
-**Next Up**: Implement Google OAuth authentication (backend and frontend)
+**Next Up**: Implement user management endpoints (list users, promote to admin)
 
 ---
 

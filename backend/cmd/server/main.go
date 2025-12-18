@@ -7,6 +7,8 @@ import (
 
 	"github.com/candidate-organizer/backend/internal/api"
 	"github.com/candidate-organizer/backend/internal/config"
+	"github.com/candidate-organizer/backend/internal/database"
+	"github.com/candidate-organizer/backend/internal/repository"
 )
 
 func main() {
@@ -16,8 +18,27 @@ func main() {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
+	// Initialize database connection
+	dbWrapper, err := database.New(cfg.DatabaseURL)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer dbWrapper.Close()
+
+	log.Println("Successfully connected to database")
+
+	// Get the underlying sql.DB
+	db := dbWrapper.DB
+
+	// Initialize repositories
+	userRepo := repository.NewPostgresUserRepository(db)
+	jobRepo := repository.NewPostgresJobRepository(db)
+	candidateRepo := repository.NewPostgresCandidateRepository(db)
+	commentRepo := repository.NewPostgresCommentRepository(db)
+	attributeRepo := repository.NewPostgresAttributeRepository(db)
+
 	// Initialize API server
-	server := api.NewServer(cfg)
+	server := api.NewServer(cfg, userRepo, jobRepo, candidateRepo, commentRepo, attributeRepo)
 
 	// Start server
 	addr := fmt.Sprintf(":%s", cfg.Port)
