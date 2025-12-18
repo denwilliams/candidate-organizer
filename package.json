@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "heroku-prebuild": "(cd frontend && npm install --include=dev && npm run build) && cp -r backend/cmd backend/internal backend/migrations . && chmod +x start-services.sh"
+    "heroku-postbuild": "./heroku-build.sh"
   },
   "engines": {
     "node": ">=18.x",
