@@ -3,11 +3,11 @@ import { User } from '../types';
 
 export const usersApi = {
   getProfile: (token: string) =>
-    api.get<User>('/api/users/me', token),
+    api.get<User>('/api/v1/auth/me', token),
 
-  listAll: (token: string) =>
-    api.get<User[]>('/api/users', token),
+  listAll: () =>
+    api.get<{ users: User[] }>('/api/v1/users'),
 
-  promoteToAdmin: (userId: string, token: string) =>
-    api.post(`/api/users/${userId}/promote`, undefined, token),
+  promoteToAdmin: (userId: string) =>
+    api.post<{ message: string; user: User }>(`/api/v1/users/${userId}/promote`, undefined),
 };

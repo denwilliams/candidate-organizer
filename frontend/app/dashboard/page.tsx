@@ -155,6 +155,17 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {user.role === 'admin' && (
+          <div className="mt-8 bg-white shadow rounded-lg p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Admin Tools</h3>
+            <div className="flex gap-4">
+              <Button onClick={() => router.push('/users')} variant="outline">
+                Manage Users
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="mt-8 bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Getting Started</h3>
           <ul className="space-y-3 text-sm text-gray-600">
