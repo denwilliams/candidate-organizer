@@ -25,10 +25,27 @@ sleep 2
 
 # Start Next.js frontend on $PORT (from Heroku)
 echo "Starting Next.js frontend on port $PORT..."
-cd frontend/.next/standalone
-node server.js &
-FRONTEND_PID=$!
-cd ../../..
+
+# Check where server.js is located (monorepo vs standalone structure)
+if [ -f "frontend/.next/standalone/frontend/server.js" ]; then
+    echo "  Using monorepo structure: frontend/.next/standalone/frontend/server.js"
+    cd frontend/.next/standalone/frontend
+    node server.js &
+    FRONTEND_PID=$!
+    cd ../../../..
+elif [ -f "frontend/.next/standalone/server.js" ]; then
+    echo "  Using standalone structure: frontend/.next/standalone/server.js"
+    cd frontend/.next/standalone
+    node server.js &
+    FRONTEND_PID=$!
+    cd ../../..
+else
+    echo "ERROR: Cannot find server.js in standalone directory!"
+    echo "Checked:"
+    echo "  - frontend/.next/standalone/frontend/server.js"
+    echo "  - frontend/.next/standalone/server.js"
+    exit 1
+fi
 
 echo "Services started:"
 echo "  - Backend PID: $BACKEND_PID"
