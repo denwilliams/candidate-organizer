@@ -13,10 +13,12 @@ Web application to help organize and triage job candidates.
 - Google Authentication locked to a single Google Workspace domain for secure access
 - Salary Expectation Tracking for each candidate, with this data hidden from most users and only visible to admins
 - First user to sign up becomes the admin, with ability to promote other users to admin status
+- It is expected that each "organization" will have their own installation of the app, so no multi-tenancy is required
 
 Future Features:
 - Filter and sort candidates based on various criteria
 - Export candidate data to CSV for reporting or sharing
+- Embeddings generation for candidates and job postings for advanced search and matching capabilities
 
 ## Tech Stack
 
@@ -28,3 +30,8 @@ Future Features:
 - Bundle into single Docker container for easy deployment where the React project is served via the Golang backend
 - When developing locally allow running React frontend and Golang backend separately for faster development cycle
 - Use Docker Compose to orchestrate local development environment with Postgres and backend/frontend services
+
+## LLM Integration
+
+- Use OpenAI GPT-5.2 models for AI features
+- Use streaming API for chat feature to allow real-time responses
