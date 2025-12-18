@@ -27,10 +27,10 @@ sleep 2
 
 # Start Next.js frontend on $PORT (from Heroku)
 echo "Starting Next.js frontend on port $PORT..."
-cd frontend
+cd frontend/.next/standalone
 node server.js &
 FRONTEND_PID=$!
-cd ..
+cd ../../..
 
 echo "Services started:"
 echo "  - Backend PID: $BACKEND_PID"
