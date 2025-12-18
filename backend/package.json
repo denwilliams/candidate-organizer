@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "heroku-prebuild": "cd ../frontend && npm install && npm run build && cd ../backend && mkdir -p static && cp -r ../frontend/out/* static/"
+    "heroku-prebuild": "echo 'Current dir:' && pwd && echo 'Listing:' && ls -la && echo 'Looking for frontend...' && ls -la .. || true && if [ -d /tmp/build*/frontend ]; then cd /tmp/build*/frontend && npm install && npm run build && mkdir -p /tmp/build*/backend/static && cp -r out/* /tmp/build*/backend/static/; else echo 'Trying relative path...'; cd ../frontend && npm install && npm run build && cd ../backend && mkdir -p static && cp -r ../frontend/out/* static/; fi"
   },
   "engines": {
     "node": ">=18.x",
