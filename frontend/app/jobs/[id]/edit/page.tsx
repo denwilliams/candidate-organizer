@@ -7,6 +7,11 @@ import { jobsApi, UpdateJobPostingData } from '@/lib/api/services/jobs';
 import { JobPosting } from '@/lib/api/types';
 import { Button } from '@/components/ui/button';
 
+// Required for static export - returns empty array since routes are dynamic
+export function generateStaticParams() {
+  return [];
+}
+
 export default function EditJobPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
