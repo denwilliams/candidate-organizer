@@ -1,14 +1,15 @@
 # Heroku Deployment Setup
 
-This repository uses a monorepo structure with the backend in the `backend/` directory and frontend in the `frontend/` directory. The deployment is configured to serve both the API and the frontend static files from a single Heroku dyno.
+This repository uses a monorepo structure with the backend in the `backend/` directory and frontend in the `frontend/` directory. The deployment is configured to run both the Next.js server and Go backend API on a single Heroku dyno.
 
 ## How It Works
 
 During deployment:
-1. The Node.js buildpack builds the Next.js frontend into static files
-2. The static files are copied to `backend/static/`
-3. The Go buildpack compiles the backend server
-4. The Go server serves both the API endpoints and the frontend static files
+1. The Node.js buildpack builds the Next.js frontend using standalone output mode
+2. The Go buildpack compiles the backend server
+3. Both services start via a process manager script (`start-services.sh`)
+4. Next.js runs as the web server and proxies API requests to the Go backend
+5. If either service crashes, the entire dyno restarts to maintain system integrity
 
 ## Required Heroku Configuration
 
@@ -58,18 +59,29 @@ git push heroku main
 
 ## Frontend Configuration
 
-The frontend is built as static files during deployment and served by the Go backend server:
+The frontend runs as a full Next.js server with all features enabled:
 
-- Next.js is configured with `output: 'export'` to generate static files
-- Static files are automatically built during deployment via the `heroku-prebuild` script in `backend/package.json`
-- The Go server serves the static files from the `backend/static/` directory
-- All API requests go to `/api/v1/*` endpoints
+- Next.js is configured with `output: 'standalone'` for optimized production builds
+- Supports all Next.js features including dynamic routes, SSR, ISR, and API routes
+- Next.js proxies API requests from `/api/v1/*` to the Go backend on port 8080
 - The frontend and API share the same domain, eliminating CORS issues
+- Process monitoring ensures both services stay healthy
 
 ## Notes
 
 - The monorepo buildpack allows Heroku to treat the `backend/` directory as the app root
 - The Node.js buildpack runs first and executes the `heroku-prebuild` script to build the frontend
-- The Go buildpack then compiles the backend server which serves both API and static files
-- The Procfile runs relative to the APP_BASE directory
+- The Go buildpack then compiles the backend server
+- The `start-services.sh` script manages both processes and monitors their health
+- If either service crashes, the script exits and Heroku automatically restarts the dyno
 - No separate frontend deployment is needed - everything runs from a single Heroku dyno
+
+## Process Management
+
+The `start-services.sh` script provides robust process management:
+
+- Starts the Go backend on port 8080
+- Starts the Next.js server on the port specified by Heroku ($PORT)
+- Monitors both processes every 5 seconds
+- If either process dies, kills the other and exits (triggering Heroku restart)
+- This ensures the application stays in a consistent state

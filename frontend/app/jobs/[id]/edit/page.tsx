@@ -1,15 +1,17 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { jobsApi, CreateJobPostingData } from '@/lib/api/services/jobs';
+import { jobsApi, UpdateJobPostingData } from '@/lib/api/services/jobs';
 import { Button } from '@/components/ui/button';
 
-export default function NewJobPage() {
+export default function EditJobPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
-  const [formData, setFormData] = useState<CreateJobPostingData>({
+  const params = useParams();
+  const jobId = params.id as string;
+  const [formData, setFormData] = useState<UpdateJobPostingData>({
     title: '',
     description: '',
     requirements: '',
@@ -17,6 +19,7 @@ export default function NewJobPage() {
     salary_range: '',
     status: 'draft',
   });
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,6 +28,34 @@ export default function NewJobPage() {
       router.push('/login');
     }
   }, [isLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (isAuthenticated && jobId) {
+      fetchJob();
+    }
+  }, [isAuthenticated, jobId]);
+
+  const fetchJob = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await jobsApi.getById(jobId);
+      const job = response.job;
+      setFormData({
+        title: job.title,
+        description: job.description,
+        requirements: job.requirements,
+        location: job.location,
+        salary_range: job.salary_range,
+        status: job.status,
+      });
+    } catch (err: any) {
+      setError(err.message || 'Failed to load job posting');
+      console.error('Error fetching job:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,11 +68,11 @@ export default function NewJobPage() {
     try {
       setSubmitting(true);
       setError(null);
-      await jobsApi.create(formData);
-      router.push('/jobs');
+      await jobsApi.update(jobId, formData);
+      router.push(`/jobs/${jobId}`);
     } catch (err: any) {
-      setError(err.message || 'Failed to create job posting');
-      console.error('Error creating job:', err);
+      setError(err.message || 'Failed to update job posting');
+      console.error('Error updating job:', err);
     } finally {
       setSubmitting(false);
     }
@@ -54,7 +85,7 @@ export default function NewJobPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  if (isLoading) {
+  if (isLoading || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -85,7 +116,7 @@ export default function NewJobPage() {
               </nav>
             </div>
             <div className="flex items-center gap-4">
-              <Button onClick={() => router.push('/jobs')} variant="outline" size="sm">
+              <Button onClick={() => router.push(`/jobs/${jobId}`)} variant="outline" size="sm">
                 Cancel
               </Button>
             </div>
@@ -95,9 +126,9 @@ export default function NewJobPage() {
 
       <main className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">Create Job Posting</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Edit Job Posting</h2>
           <p className="mt-1 text-sm text-gray-500">
-            Fill in the details for your new job posting
+            Update the details for this job posting
           </p>
         </div>
 
@@ -204,14 +235,14 @@ export default function NewJobPage() {
           <div className="flex justify-end gap-4 pt-4 border-t">
             <Button
               type="button"
-              onClick={() => router.push('/jobs')}
+              onClick={() => router.push(`/jobs/${jobId}`)}
               variant="outline"
               disabled={submitting}
             >
               Cancel
             </Button>
             <Button type="submit" disabled={submitting}>
-              {submitting ? 'Creating...' : 'Create Job Posting'}
+              {submitting ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </form>
