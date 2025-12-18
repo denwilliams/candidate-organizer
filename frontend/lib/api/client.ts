@@ -62,6 +62,7 @@ export async function apiRequest<T = any>(
   const response = await fetch(url, {
     ...fetchOptions,
     headers,
+    credentials: 'include', // Important: include cookies for authentication
   });
 
   return handleResponse<T>(response);
