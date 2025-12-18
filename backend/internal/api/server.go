@@ -100,8 +100,9 @@ func (s *Server) Router() http.Handler {
 			// Apply auth middleware to all routes in this group
 			r.Use(s.authMiddleware.Authenticate)
 
-			// User routes
+			// User routes (admin only)
 			r.Route("/users", func(r chi.Router) {
+				r.Use(s.authMiddleware.RequireAdmin)
 				r.Get("/", s.handleListUsers)
 				r.Post("/{id}/promote", s.handlePromoteUser)
 			})
@@ -209,9 +210,57 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, map[string]string{"status": "healthy"})
 }
 
+// User management handlers
+
+// handleListUsers returns a list of all users (admin only)
+func (s *Server) handleListUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := s.userRepo.List(r.Context())
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "Failed to fetch users",
+		})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"users": users,
+	})
+}
+
+// handlePromoteUser promotes a user to admin role (admin only)
+func (s *Server) handlePromoteUser(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "id")
+	if userID == "" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{
+			"error": "User ID is required",
+		})
+		return
+	}
+
+	// Promote the user to admin
+	if err := s.userRepo.PromoteToAdmin(r.Context(), userID); err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "Failed to promote user",
+		})
+		return
+	}
+
+	// Fetch the updated user to return
+	user, err := s.userRepo.GetByID(r.Context(), userID)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{
+			"error": "User promoted but failed to fetch updated user",
+		})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"message": "User promoted to admin successfully",
+		"user":    user,
+	})
+}
+
 // Placeholder handlers - to be implemented
-func (s *Server) handleListUsers(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
-func (s *Server) handlePromoteUser(w http.ResponseWriter, r *http.Request)             { notImplemented(w) }
 func (s *Server) handleListJobs(w http.ResponseWriter, r *http.Request)                { notImplemented(w) }
 func (s *Server) handleCreateJob(w http.ResponseWriter, r *http.Request)               { notImplemented(w) }
 func (s *Server) handleGetJob(w http.ResponseWriter, r *http.Request)                  { notImplemented(w) }
