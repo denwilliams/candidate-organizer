@@ -128,7 +128,7 @@
 ## Phase 6: AI Features
 
 ### 6.1 AI Candidate Summary
-- [ ] Backend: Integrate OpenAI GPT-4o (or GPT-4 Turbo) API
+- [ ] Backend: Integrate OpenAI GPT-5.2 API
 - [ ] Backend: Generate candidate summary endpoint
 - [ ] Backend: Cache AI summaries to reduce API costs
 - [ ] Backend: Prompt engineering for candidate evaluation (strengths, gaps, red flags)

@@ -46,7 +46,7 @@ A comprehensive web application to help organize and triage job candidates with 
 - **Database**: PostgreSQL with UUID support
 
 ### LLM Integration
-- **AI Provider**: OpenAI GPT-4o (or GPT-4 Turbo) for AI features
+- **AI Provider**: OpenAI GPT-5.2 for AI features
 - **Chat Implementation**: Streaming API for real-time chat responses
 - **Use Cases**: Candidate summaries, intelligent chat assistant for candidate evaluation
 
