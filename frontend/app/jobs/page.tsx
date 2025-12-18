@@ -102,7 +102,9 @@ export default function JobsPage() {
             </p>
           </div>
           <div className="mt-4 sm:mt-0">
-            <p className="text-sm text-gray-500">Create job posting feature coming soon</p>
+            <Button onClick={() => router.push('/jobs/new')}>
+              Create Job Posting
+            </Button>
           </div>
         </div>
 
@@ -138,7 +140,9 @@ export default function JobsPage() {
             <h3 className="mt-2 text-sm font-semibold text-gray-900">No job postings</h3>
             <p className="mt-1 text-sm text-gray-500">Get started by creating a new job posting.</p>
             <div className="mt-6">
-              <p className="text-sm text-gray-500">Job creation feature coming soon</p>
+              <Button onClick={() => router.push('/jobs/new')}>
+                Create Job Posting
+              </Button>
             </div>
           </div>
         )}
