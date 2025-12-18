@@ -1,4 +1,7 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+// Use window.location.origin for browser context, fallback to localhost for SSR/build time
+const API_BASE_URL = typeof window !== 'undefined'
+  ? window.location.origin
+  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080');
 
 export interface ApiError {
   error: string;

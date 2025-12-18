@@ -11,8 +11,12 @@ export const authService = {
    * Get the OAuth URL to redirect to Google login
    */
   getGoogleAuthUrl: (): string => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-    return `${apiUrl}/api/v1/auth/google`;
+    // Use relative URL since frontend and backend are on the same domain
+    // Falls back to localhost for local development
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/api/v1/auth/google`;
+    }
+    return 'http://localhost:8080/api/v1/auth/google';
   },
 
   /**
@@ -44,7 +48,8 @@ export const authService = {
     try {
       // The backend sets the auth_token in an HTTP-only cookie
       // We need to make a request to get the user profile
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      // Use relative URL since frontend and backend are on the same domain
+      const apiUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8080';
       const response = await fetch(`${apiUrl}/api/v1/auth/me`, {
         credentials: 'include', // Important: include cookies
       });
