@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "heroku-prebuild": "npm install --prefix frontend && npm run build --prefix frontend && mkdir -p backend/static && cp -r frontend/out/* backend/static/"
+    "heroku-prebuild": "echo '=== PWD ===' && pwd && echo '=== LS ===' && ls -la && echo '=== Frontend contents ===' && ls -la frontend && echo '=== Installing frontend deps ===' && npm install --prefix frontend && echo '=== Building frontend ===' && npm run build --prefix frontend && mkdir -p backend/static && cp -r frontend/out/* backend/static/"
   },
   "engines": {
     "node": ">=18.x",
