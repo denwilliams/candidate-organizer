@@ -1,1 +1,1 @@
-web: bin/server
+web: ./start-services.sh

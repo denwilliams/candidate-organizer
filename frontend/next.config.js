@@ -1,14 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export',
-  // Disable image optimization for static export
+  output: 'standalone',
+  // Optimize images (can enable optimization with standalone)
   images: {
-    unoptimized: true,
+    unoptimized: true, // Keep unoptimized for now, can enable later
   },
-  // Remove rewrites since API will be on same origin
-  basePath: '',
-  trailingSlash: true,
+  // Proxy API requests to Go backend
+  async rewrites() {
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: 'http://localhost:8080/api/v1/:path*',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
