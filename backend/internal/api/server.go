@@ -80,23 +80,25 @@ func (s *Server) Router() http.Handler {
 
 	// API routes
 	r.Route("/api/v1", func(r chi.Router) {
-		// Auth routes (public)
+		// Auth routes (public and protected combined)
 		r.Route("/auth", func(r chi.Router) {
+			// Public auth routes (no middleware)
 			r.Get("/google", s.authHandler.GoogleLogin)
 			r.Get("/callback", s.authHandler.GoogleCallback)
+
+			// Protected auth routes (with middleware)
+			r.Group(func(r chi.Router) {
+				r.Use(s.authMiddleware.Authenticate)
+				r.Post("/refresh", s.authHandler.RefreshToken)
+				r.Post("/logout", s.authHandler.Logout)
+				r.Get("/me", s.authHandler.GetProfile)
+			})
 		})
 
 		// Protected routes
 		r.Group(func(r chi.Router) {
 			// Apply auth middleware to all routes in this group
 			r.Use(s.authMiddleware.Authenticate)
-
-			// Auth-related protected endpoints
-			r.Route("/auth", func(r chi.Router) {
-				r.Post("/refresh", s.authHandler.RefreshToken)
-				r.Post("/logout", s.authHandler.Logout)
-				r.Get("/me", s.authHandler.GetProfile)
-			})
 
 			// User routes
 			r.Route("/users", func(r chi.Router) {
