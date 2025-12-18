@@ -61,11 +61,11 @@
 - [x] First user admin assignment logic
 
 ### 2.2 User Management (Admin Only)
-- [ ] Backend: List all users endpoint
-- [ ] Backend: Promote user to admin endpoint
-- [ ] Frontend: User management page
-- [ ] Frontend: User list with role badges
-- [ ] Frontend: Promote to admin button
+- [x] Backend: List all users endpoint
+- [x] Backend: Promote user to admin endpoint
+- [x] Frontend: User management page
+- [x] Frontend: User list with role badges
+- [x] Frontend: Promote to admin button
 
 ## Phase 3: Core Features - Job Postings
 
@@ -239,9 +239,9 @@
 - ✅ Phase 1.3: Backend Foundation - Complete (10/10)
 - ✅ Phase 1.4: Frontend Foundation - Complete (8/8)
 
-**Phase 2: Core Features - User Management & Authentication** - 🟡 IN PROGRESS
+**Phase 2: Core Features - User Management & Authentication** - ✅ COMPLETE
 - ✅ Phase 2.1: Authentication - Complete (7/7)
-- 🔄 Phase 2.2: User Management - Not started (0/5)
+- ✅ Phase 2.2: User Management - Complete (5/5)
 
 **Completed in this session:**
 - ✅ Implemented Google OAuth 2.0 authentication (backend and frontend)
@@ -251,8 +251,11 @@
 - ✅ Auth middleware with HTTP-only cookie support
 - ✅ Login page, auth callback page, and dashboard
 - ✅ Integrated authentication flow with AuthContext
+- ✅ Implemented user management endpoints (list users, promote to admin)
+- ✅ Created admin-only user management page with role badges
+- ✅ Added promote to admin functionality with proper access controls
 
-**Next Up**: Implement user management endpoints (list users, promote to admin)
+**Next Up**: Phase 3 - Job Postings CRUD operations
 
 ---
 
