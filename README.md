@@ -35,7 +35,7 @@ A comprehensive web application to help organize and triage job candidates with 
 - **UI Components**: Shadcn UI (to be added)
 
 ### Backend
-- **Language**: Go 1.21+
+- **Language**: Go 1.24+
 - **Router**: Chi v5
 - **Database**: PostgreSQL 16
 - **Architecture**: Clean architecture with repository pattern (no ORM, handwritten SQL)
@@ -84,7 +84,7 @@ candidate-organizer/
 ### Prerequisites
 
 - **Docker** and **Docker Compose** (recommended)
-- **Go 1.21+** (for local backend development)
+- **Go 1.24+** (for local backend development)
 - **Node.js 20+** and **npm** (for local frontend development)
 - **PostgreSQL 16** (if running without Docker)
 
