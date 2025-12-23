@@ -1,6 +1,11 @@
 -- Initial database schema for Candidate Organizer
+-- This script creates all tables in the schema specified by POSTGRES_SCHEMA environment variable
+-- The schema should be created by 000_init_schema.sh before this runs
 
--- Enable UUID extension
+-- Note: This migration assumes the schema already exists
+-- Tables will be created in whatever schema is in the current search_path
+
+-- Enable UUID extension (in public schema so it's available everywhere)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users table

@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// Initialize database connection
-	dbWrapper, err := database.New(cfg.DatabaseURL)
+	dbWrapper, err := database.New(cfg.DatabaseURL, cfg.PostgresSchema)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}

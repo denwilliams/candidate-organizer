@@ -169,6 +169,7 @@ candidate-organizer/
 ```env
 PORT=8080
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/candidate_organizer?sslmode=disable
+POSTGRES_SCHEMA=public  # PostgreSQL schema name (optional, defaults to 'public')
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 GOOGLE_REDIRECT_URL=http://localhost:8080/api/v1/auth/callback
@@ -199,6 +200,35 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 ### Migrations
 
 The database schema is initialized automatically when you start the PostgreSQL container. The migration files are located in `backend/migrations/`.
+
+### Custom PostgreSQL Schemas
+
+The application supports running on custom PostgreSQL schemas, allowing you to:
+- Run multiple isolated instances on the same database
+- Organize database objects by environment (e.g., `dev`, `staging`, `prod`)
+- Implement multi-tenancy at the schema level
+
+To use a custom schema:
+
+1. **Set the environment variable** in your `.env` file or docker-compose:
+   ```env
+   POSTGRES_SCHEMA=my_custom_schema
+   ```
+
+2. **Start the application** - The schema will be created automatically during migration
+
+3. **Example use cases**:
+   ```env
+   # Different environments
+   POSTGRES_SCHEMA=app_production
+   POSTGRES_SCHEMA=app_staging
+
+   # Multi-tenant setups
+   POSTGRES_SCHEMA=tenant_acme
+   POSTGRES_SCHEMA=tenant_widgets_inc
+   ```
+
+**Note**: If not specified, the application defaults to the `public` schema.
 
 ### Schema Overview
 

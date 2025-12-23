@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Port              string
 	DatabaseURL       string
+	PostgresSchema    string
 	GoogleClientID    string
 	GoogleClientSecret string
 	GoogleRedirectURL string
@@ -22,6 +23,7 @@ func Load() (*Config, error) {
 	cfg := &Config{
 		Port:              getEnv("PORT", "8080"),
 		DatabaseURL:       getEnv("DATABASE_URL", ""),
+		PostgresSchema:    getEnv("POSTGRES_SCHEMA", "public"),
 		GoogleClientID:    getEnv("GOOGLE_CLIENT_ID", ""),
 		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
 		GoogleRedirectURL: getEnv("GOOGLE_REDIRECT_URL", "http://localhost:8080/auth/callback"),
